@@ -27,19 +27,23 @@ class RestaurantsSpider(scrapy.Spider):
 
     def parse(self, response):
 
-       yield scrapy.Request(response.url,meta= {
-              "playwright": True,
-              "playwright_include_page": True,
-              "playwright_page_methods":[
-                   PageMethod('click', 'div.CpccDe'),
-                   PageMethod("wait_for_selector", 'div.tAiQdd'),
-                   PageMethod('wait_for_timeout', 5000),
-                   
+       restaurant_elements = response.css('div.CpccDe')
+       for restaurant in restaurant_elements[:3]:
+            a_tag = restaurant.css('a.hfpxzc').getall()
+    
+            yield scrapy.Request(response.url,meta= {
+                "playwright": True,
+                "playwright_include_page": True,
+                "playwright_page_methods":[
+                    PageMethod('click', a_tag),
+                    PageMethod("wait_for_selector", 'div.tAiQdd'),
+                    PageMethod('wait_for_timeout', 5000),
           ]
        },
        callback=self.parse_restaurant_details
        )
-
+            
+            
     def parse_restaurant_details(self, response):
        
        restaurant_elements = response.css('div.tAiQdd')
